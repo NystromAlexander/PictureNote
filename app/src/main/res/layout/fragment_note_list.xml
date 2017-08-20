@@ -10,4 +10,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="se.umu.cs.dv15anm.picturenote.NoteFragment"
-    tools:listitem="@layout/fragment_note" />
+    tools:listitem="@layout/fragment_note"
+    />

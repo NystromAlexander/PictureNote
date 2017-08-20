@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:color/black"
+              android:keepScreenOn="true"
+              android:orientation="horizontal"
+              tools:context="se.umu.cs.dv15anm.picturenote.camera.ocr.OcrCameraFragment">
+
+    <android.support.v7.widget.FitWindowsFrameLayout
+        android:id="@+id/preview_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <se.umu.cs.dv15anm.picturenote.camera.overlay.Overlay
+            android:id="@+id/graphic_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </android.support.v7.widget.FitWindowsFrameLayout>
+
+    <Button
+        android:id="@+id/ocr_capture_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/capture_button"/>
+</LinearLayout>

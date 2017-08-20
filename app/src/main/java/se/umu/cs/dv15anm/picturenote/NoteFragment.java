@@ -1,109 +1,258 @@
 package se.umu.cs.dv15anm.picturenote;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 
-import se.umu.cs.dv15anm.picturenote.dummy.DummyContent;
-import se.umu.cs.dv15anm.picturenote.dummy.DummyContent.DummyItem;
+import java.util.ArrayList;
+import java.util.Date;
 
-import java.util.List;
+import se.umu.cs.dv15anm.picturenote.camera.PicturePagerActivity;
+import se.umu.cs.dv15anm.picturenote.database.NoteBoard;
+import se.umu.cs.dv15anm.picturenote.helpers.NoteType;
+import se.umu.cs.dv15anm.picturenote.models.Note;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
+ * Fragment to Display a note
  */
 public class NoteFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private static final String TAG = "NoteFragment";
+    private static final String ARG_NOTE_ID = "note_id";
+    private static final String ARG_NOTE_TEXT_LIST = "note_text_list";
+    private static final String ARG_NOTE_IMG_PATH_LIST = "note_img_uri_list";
+    private static final String ARG_NOTE_TEXT = "note_text";
+    private static final String ARG_NOTE_IMG_PATH = "note_img_path_list";
+
+    private Note mNote;
+    private EditText mTitleField;
+    private EditText mNoteText;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
+     * fragment
      */
     public NoteFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static NoteFragment newInstance(int columnCount) {
+    /**
+     * Create a new instance of the fragment with database id as argument.
+     * @param noteId The notes database id.
+     * @return The new fragment.
+     */
+    public static NoteFragment newInstance(long noteId) {
         NoteFragment fragment = new NoteFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putLong(ARG_NOTE_ID, noteId);
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_note_list, container, false);
-
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new NoteRecyclerViewAdapter(DummyContent.ITEMS, mListener));
-        }
-        return view;
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    /**
+     * Create a new instance of the fragment.
+     * @param noteText The text extracted from one or more images.
+     * @param imageUri The images that the text was extracted from.
+     * @return The new fragment.
+     */
+    public static NoteFragment newInstance(ArrayList<String> noteText, ArrayList<String> imageUri) {
+        NoteFragment fragment = new NoteFragment();
+        Bundle args = new Bundle();
+        args.putStringArrayList(ARG_NOTE_TEXT_LIST, noteText);
+        args.putStringArrayList(ARG_NOTE_IMG_PATH_LIST, imageUri);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * Create a new instance of the fragment.
+     * @param noteText The text that was extracted from a image.
+     * @param imageUri The image that the text was extracted from.
+     * @return The new fragment.
      */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+    public static NoteFragment newInstance(String noteText, String imageUri) {
+        NoteFragment fragment = new NoteFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_NOTE_TEXT, noteText);
+        args.putString(ARG_NOTE_IMG_PATH, imageUri);
+        fragment.setArguments(args);
+        return fragment;
     }
+
+    /**
+     * Initialize the fragment and get the arguments.
+     * @param savedInstanceState The saved data from the fragment.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        if (getArguments() != null) {
+            if (getArguments().containsKey(ARG_NOTE_ID)) {
+                long id = getArguments().getLong(ARG_NOTE_ID);
+                mNote = NoteBoard.getNoteBoard(getActivity()).getNote(id);
+
+            } else if (getArguments().containsKey(ARG_NOTE_TEXT_LIST) &&
+                    getArguments().containsKey(ARG_NOTE_IMG_PATH_LIST)) {
+                mNote = new Note(NoteType.STANDARD);
+                //A note can only have one text and image so only the first item should be retrieved
+                String noteText = getArguments().getStringArrayList(ARG_NOTE_TEXT_LIST).get(0);
+                String imageUri = getArguments().getStringArrayList(ARG_NOTE_IMG_PATH_LIST).get(0);
+                mNote.setText(noteText);
+                mNote.setNoteImage(imageUri);
+
+            } else if (getArguments().containsKey(ARG_NOTE_TEXT) &&
+                    getArguments().containsKey(ARG_NOTE_IMG_PATH)) {
+                mNote = new Note(NoteType.STANDARD);
+                String noteText = getArguments().getString(ARG_NOTE_TEXT);
+                String imageUri = getArguments().getString(ARG_NOTE_IMG_PATH);
+                mNote.setText(noteText);
+                mNote.setNoteImage(imageUri);
+            }
+        } else {
+            mNote = new Note(NoteType.STANDARD);
+        }
+    }
+
+    /**
+     * Create the UI.
+     * @param inflater The LayoutInflater to inflate the views.
+     * @param container The parent that the fragment view will be attached to.
+     * @param savedInstanceState The saved data from the fragment
+     * @return The view with the fragments UI.
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_note, container, false);
+        mTitleField = (EditText) view.findViewById(R.id.note_title);
+        mTitleField.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        mTitleField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mNote.setTitle(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        mNoteText = (EditText) view.findViewById(R.id.note_text);
+        mNoteText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mNote.setText(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        if (mNote != null) {
+            setupExistingNote();
+        }
+
+        return view;
+    }
+
+    /**
+     * When the fragment is paused save the data to the database.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveToDb();
+    }
+
+    /**
+     * Create the menu on the actionbar
+     * @param menu The menu where the items will be placed
+     * @param inflater The inflater that will inflate the UI.
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_note, menu);
+    }
+
+    /**
+     * Handles the return calls when an item is selected in the options menu.
+     *
+     * If the menu item view_picture is selected, a new activity will be started where the images
+     * related to the note will be shown.
+     *
+     * @param item The selected menu item.
+     * @return true if handled else false
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.view_picture:
+                ArrayList<String> images = new ArrayList<>();
+                images.add(mNote.getNoteImage());
+                Intent intent = PicturePagerActivity.newIntent(getActivity(), images);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    /**
+     * Sets up the text fields if the note already has text.
+     * If the note has the default title the text will be marked to make the title change easier.
+     */
+    private void setupExistingNote() {
+        String title = mNote.getTitle();
+        if (!title.isEmpty()) {
+            mTitleField.setText(title);
+            if (title.equals(getResources().getString(R.string.default_title))) {
+                mTitleField.selectAll();
+            }
+        }
+        mNoteText.setText(mNote.getText());
+    }
+
+    /**
+     * Saves the note to the database
+     */
+    private void saveToDb(){
+        mNote.setDate(new Date());
+        if (mNote.getTitle().isEmpty()) {
+            String title = getResources().getString(R.string.default_title);
+            mNote.setTitle(title);
+        }
+        if (mNote.getId() != 0) {
+            NoteBoard.getNoteBoard(getActivity()).updateNote(mNote);
+        } else {
+            NoteBoard.getNoteBoard(getActivity()).addNote(mNote);
+        }
+    }
+
+
+
 }

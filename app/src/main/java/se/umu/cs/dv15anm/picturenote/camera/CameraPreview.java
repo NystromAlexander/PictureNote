@@ -1,10 +1,7 @@
-package se.umu.cs.dv15anm.picturenote;
+package se.umu.cs.dv15anm.picturenote.camera;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
-import android.media.MediaActionSound;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -15,7 +12,7 @@ import android.view.WindowManager;
 import static android.content.Context.WINDOW_SERVICE;
 
 /**
- * Created by Roguz on 09/08/2017.
+ * The preview showing what the camera sees.
  */
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
@@ -24,6 +21,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private Context mContext;
 
+    /**
+     * Create the camera preview
+     * @param context The context of the calling activity
+     * @param camera The camera that will be displayed in the preview
+     */
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
@@ -32,6 +34,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.addCallback(this);
     }
 
+    /**
+     * When the surface is created start the preview
+     * @param holder The view holder
+     */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         try {
@@ -43,10 +49,17 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    /**
+     * When the surface changes, either by beeing rotated or other action causing it to change.
+     * Fix the preview so that it matches the rotation.
+     * @param holder The view holder
+     * @param format The format of the view
+     * @param width The width of the view
+     * @param height The height of the view
+     */
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
-        //Make sure the surface exists
         if (mHolder.getSurface() == null) {
             return;
         }
@@ -59,15 +72,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
 
         Camera.Parameters parameters = mCamera.getParameters();
-        Display display = ((WindowManager)mContext.getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-//        Camera.Parameters params = mCamera.getParameters();
+        Display display = ((WindowManager)mContext.getSystemService(WINDOW_SERVICE))
+                .getDefaultDisplay();
+
         if (parameters.getSupportedFocusModes().contains(
                 Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-            Log.d(TAG,"Has continuous focus");
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         }
         mCamera.setParameters(parameters);
-        //TODO fix camera rotation
 
         if(display.getRotation() == Surface.ROTATION_0)
         {
