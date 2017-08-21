@@ -2,20 +2,14 @@ package se.umu.cs.dv15anm.picturenote.camera;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 
 import se.umu.cs.dv15anm.picturenote.R;
 
@@ -32,7 +26,7 @@ public class PicturePagerActivity extends AppCompatActivity {
     /**
      * Create the activity and get the list with the image paths from the intent, and set the pager
      * adapter to display the images in a PictureFragment.
-     * @param savedInstanceState
+     * @param savedInstanceState The saved data from the activity.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

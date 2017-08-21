@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import se.umu.cs.dv15anm.picturenote.R;
+import se.umu.cs.dv15anm.picturenote.helpers.ImageAssists;
 
 /**
  * Fragment displaying a picture.
@@ -27,8 +28,12 @@ public class PictureFragment extends Fragment {
     private String mImagePath;
     private ImageView mImageView;
 
+    /**
+     * Mandatory empty constructor for the fragment manager to instantiate the
+     * fragment
+     */
     public PictureFragment() {
-        // Required empty public constructor
+
     }
 
 
@@ -37,7 +42,7 @@ public class PictureFragment extends Fragment {
      * @param inflater Used to inflate the UI elements.
      * @param container The container that will host the fragment.
      * @param savedInstanceState Contains the saved data of the fragment
-     * @return
+     * @return The finished UI.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

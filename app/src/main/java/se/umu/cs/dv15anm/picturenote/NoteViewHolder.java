@@ -2,7 +2,6 @@ package se.umu.cs.dv15anm.picturenote;
 
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -70,7 +69,8 @@ public class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnCl
      * @param menuInfo Extra information about the item that the menu is being built.
      */
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
         MenuInflater inflater = new MenuInflater(v.getContext());
         inflater.inflate(R.menu.fragment_note_list_context,menu);
     }

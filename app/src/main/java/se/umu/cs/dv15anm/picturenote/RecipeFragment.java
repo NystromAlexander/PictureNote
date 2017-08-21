@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import se.umu.cs.dv15anm.picturenote.camera.CameraActivity;
-import se.umu.cs.dv15anm.picturenote.camera.ImageAssists;
+import se.umu.cs.dv15anm.picturenote.helpers.ImageAssists;
 import se.umu.cs.dv15anm.picturenote.camera.PicturePagerActivity;
 import se.umu.cs.dv15anm.picturenote.database.NoteBoard;
 import se.umu.cs.dv15anm.picturenote.helpers.DialogCreator;
@@ -47,6 +48,7 @@ public class RecipeFragment extends Fragment {
     private static final String ARG_RECIPE_ID = "recipe_id";
     private static final String ARG_RECIPE_TEXT = "recipe_text";
     private static final String ARG_RECIPE_IMG_PATH = "recipe_img_uri";
+    private static final String SAVED_PATH = "saved_img_path";
     private static final int SELECT_IMAGE = 1;
     private static final int TAKE_PICTURE = 2;
 
@@ -56,6 +58,7 @@ public class RecipeFragment extends Fragment {
     private EditText mIngredientsField;
     private ImageButton mFoodImage;
     private TextView mNoImageText;
+    private String mFoodImagePath;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -167,7 +170,7 @@ public class RecipeFragment extends Fragment {
                         }
                     });
                 } else {
-                    ArrayList<String> image = new ArrayList<String>();
+                    ArrayList<String> image = new ArrayList<>();
                     image.add(mRecipe.getFoodImage());
                     Intent intent = PicturePagerActivity.newIntent(getActivity(),image);
                     startActivity(intent);
@@ -175,6 +178,11 @@ public class RecipeFragment extends Fragment {
 
             }
         });
+
+        if (savedInstanceState != null) {
+            Log.d(TAG, "getting saved path");
+            mFoodImagePath = savedInstanceState.getString(SAVED_PATH);
+        }
 
         if (mRecipe != null) {
             setUpExistingRecipe();
@@ -193,12 +201,13 @@ public class RecipeFragment extends Fragment {
         if (!title.isEmpty()) {
             mTitleField.setText(title);
             if (title.equals(getResources().getString(R.string.default_title))) {
-                mTitleField.selectAll();
+                mTitleField.setText("");
+
             }
         }
         mRecipeField.setText(mRecipe.getText());
         mIngredientsField.setText(mRecipe.getIngredients());
-        if (mRecipe.getFoodImage() != null) {
+        if (mRecipe.getFoodImage() != null || mFoodImagePath != null) {
             loadImage();
         }
     }
@@ -208,8 +217,15 @@ public class RecipeFragment extends Fragment {
      */
     @Override
     public void onPause() {
+        Log.d(TAG, "pause");
         super.onPause();
         saveToDb();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVED_PATH, mFoodImagePath);
     }
 
     /**
@@ -258,18 +274,19 @@ public class RecipeFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            String imagePath;
             switch (requestCode) {
                 case SELECT_IMAGE:
                     final Uri imageUri = data.getData();
-                    imagePath = ImageAssists.getRealPathFromUri(getActivity(), imageUri);
-                    mRecipe.setFoodImage(imagePath);
+                    mFoodImagePath = ImageAssists.getRealPathFromUri(getActivity(), imageUri);
+                    mRecipe.setFoodImage(mFoodImagePath);
+                    saveToDb();
                     loadImage();
 
                     break;
                 case TAKE_PICTURE:
-                    imagePath = CameraActivity.getCapturedPicture(data);
-                    mRecipe.setFoodImage(imagePath);
+                    mFoodImagePath = CameraActivity.getCapturedPicture(data);
+                    mRecipe.setFoodImage(mFoodImagePath);
+                    saveToDb();
                     loadImage();
                     break;
             }
@@ -281,14 +298,23 @@ public class RecipeFragment extends Fragment {
      * Load the image showing the result of the recipe.
      */
     private void loadImage() {
-        File imageFile = new File(mRecipe.getFoodImage());
+        File imageFile;
+        if (mFoodImagePath != null) {
+            imageFile = new File(mFoodImagePath);
+        } else {
+            imageFile = new File(mRecipe.getFoodImage());
+        }
+
         int rotateImage = ImageAssists.getCameraPhotoOrientation(imageFile);
 
         try {
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(imageFile));
             bitmap = ImageAssists.fixOrientation(bitmap, rotateImage);
-            mFoodImage.setImageBitmap(bitmap);
-            //Hid the text saying that there is no image.
+            mFoodImage.setImageBitmap(Bitmap.createScaledBitmap(bitmap,
+                    mFoodImage.getLayoutParams().width, mFoodImage.getLayoutParams().height,
+                    false));
+            bitmap.recycle();
+            //Hide the text saying that there is no image.
             mNoImageText.setVisibility(View.INVISIBLE);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

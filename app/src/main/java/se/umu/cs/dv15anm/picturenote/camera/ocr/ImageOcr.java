@@ -1,4 +1,4 @@
-package se.umu.cs.dv15anm.picturenote.helpers;
+package se.umu.cs.dv15anm.picturenote.camera.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,8 +9,10 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
+import se.umu.cs.dv15anm.picturenote.helpers.TextConverter;
+
 /**
- * Class that has a static method to retrieve image from a bitmap representation of a image
+ * Class that has a static method to retrieve text from a bitmap representation of a image
  */
 
 public class ImageOcr {

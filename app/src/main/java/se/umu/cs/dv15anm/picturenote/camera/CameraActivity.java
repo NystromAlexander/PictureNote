@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import se.umu.cs.dv15anm.picturenote.NoteListActivity;
 import se.umu.cs.dv15anm.picturenote.R;
 
 /**
@@ -35,6 +34,7 @@ public class CameraActivity extends AppCompatActivity {
     private static final String IMAGE_PATH = "image_path";
 
     private Camera mCamera;
+
     private CameraPreview mPreview;
     FrameLayout mPreviewFrame;
 
@@ -173,12 +173,16 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     /**
-     * Create a File for saving an image or video
+     * Create a File for saving an image
+     *
+     * @param type What type of file should be created
+     * @return The newly created file.
      */
-    private static File getOutputMediaFile(int type){
+    private File getOutputMediaFile(int type){
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), NoteListActivity.APP_NAME);
+                Environment.DIRECTORY_PICTURES), getResources().getString(R.string.app_name));
+
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){

@@ -2,7 +2,6 @@
     <string name="app_name">Picture Note</string>
     <string name="capture_button">Capture</string>
 
-    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="no_camera_permission">This application can not work without camera</string>
@@ -11,17 +10,13 @@
     <string name="title_hint">Enter title</string>
     <string name="new_note">New Note</string>
     <string name="new_recipe">New Recipe</string>
-    <string name="save_button">Save</string>
     <string name="view_image">Note Image</string>
     <string name="default_title">(No title)</string>
     <string name="remove_item">Remove Note</string>
 
-    <string name="no_image_text">No image set</string>
+    <string name="no_image_text">No image</string>
 
     <string name="remove_dialog_title">Remove content</string>
     <string name="remove_dialog_message">Are you sure you want to remove the note?</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

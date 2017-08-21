@@ -12,12 +12,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import se.umu.cs.dv15anm.picturenote.models.Note;
-import se.umu.cs.dv15anm.picturenote.NoteListActivity;
-import se.umu.cs.dv15anm.picturenote.models.Recipe;
 import se.umu.cs.dv15anm.picturenote.database.NoteDbSchema.NoteTable;
 import se.umu.cs.dv15anm.picturenote.database.NoteDbSchema.RecipeTable;
 import se.umu.cs.dv15anm.picturenote.helpers.NoteType;
+import se.umu.cs.dv15anm.picturenote.models.Note;
+import se.umu.cs.dv15anm.picturenote.models.Recipe;
 
 /**
  * Class used to communicate with the database and give easy access.
@@ -26,6 +25,7 @@ import se.umu.cs.dv15anm.picturenote.helpers.NoteType;
 public class NoteBoard {
 
     private static final String TAG = "NoteBoard";
+    private static final String APP_NAME = "Picture Note";
     private static NoteBoard sNoteBoard;
 
     private SQLiteDatabase mDatabase;
@@ -58,7 +58,7 @@ public class NoteBoard {
             }
         }
 
-        try (NoteCursorWrapper cursor = quesryRecipes(null, null)) {
+        try (NoteCursorWrapper cursor = queryRecipes(null, null)) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 notes.add(cursor.getRecipe());
@@ -100,7 +100,7 @@ public class NoteBoard {
      * @return The recipe if found else null.
      */
     public Recipe getRecipe(Long id) {
-        try (NoteCursorWrapper cursor = quesryRecipes(RecipeTable.Cols.ID + " = ?",
+        try (NoteCursorWrapper cursor = queryRecipes(RecipeTable.Cols.ID + " = ?",
                 new String[]{id.toString()})) {
             if (cursor.getCount() == 0) {
                 return null;
@@ -168,11 +168,13 @@ public class NoteBoard {
         if (note.getType() == NoteType.RECIPE) {
             Recipe recipe = (Recipe) note;
             removeRecipe(recipe);
-        }
-        Long id = note.getId();
-        mDatabase.delete(NoteTable.NAME,NoteTable.Cols.ID + "  = ?",new String[]{id.toString()});
-        if (removeNoteImage(note.getNoteImage())) {
-            Log.d(TAG, "Removed image at path: "+note.getNoteImage());
+        } else {
+            Long id = note.getId();
+            mDatabase.delete(NoteTable.NAME, NoteTable.Cols.ID + "  = ?",
+                    new String[]{id.toString()});
+            if (removeNoteImage(note.getNoteImage())) {
+                Log.d(TAG, "Removed image at path: " + note.getNoteImage());
+            }
         }
     }
 
@@ -196,7 +198,8 @@ public class NoteBoard {
      * @return true if it got removed else false.
      */
     private boolean removeNoteImage(String imagePath) {
-        if (imagePath.contains(NoteListActivity.APP_NAME)) {
+        if (imagePath == null)return false ;
+        if (imagePath.contains(APP_NAME)) {
             File imageFile = new File(imagePath);
             return imageFile.delete();
         }
@@ -225,7 +228,7 @@ public class NoteBoard {
      * @param whereArgs The arguments for the where statement
      * @return The cursor to the query.
      */
-    private NoteCursorWrapper quesryRecipes(String whereClause, String[] whereArgs) {
+    private NoteCursorWrapper queryRecipes(String whereClause, String[] whereArgs) {
         Cursor cursor = mDatabase.query(RecipeTable.NAME, null, whereClause, whereArgs, null, null,
                 RecipeTable.Cols.DATE + " DESC");
 

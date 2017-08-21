@@ -35,7 +35,7 @@ public class NoteCursorWrapper extends CursorWrapper {
         Note note = new Note(title, text,new Date(date), NoteType.STANDARD);
         note.setId(id);
         note.setNoteImage(noteImage);
-
+        close();
         return note;
     }
 
@@ -58,7 +58,7 @@ public class NoteCursorWrapper extends CursorWrapper {
         recipe.setRecipeImg(recipeImage);
         recipe.setIngredientsImg(ingredientsImage);
         recipe.setFoodImage(foodImage);
-
+        close();
         return recipe;
     }
 }

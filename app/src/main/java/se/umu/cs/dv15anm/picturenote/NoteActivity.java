@@ -78,7 +78,6 @@ public class NoteActivity extends SingleFragmentActivity {
         } else {
             ArrayList<String> texts = getIntent().getStringArrayListExtra(EXTRA_NOTE_TEXT_LIST);
             ArrayList<String> imagePaths = getIntent().getStringArrayListExtra(EXTRA_NOTE_IMG_LIST);
-            Log.d(TAG, "size of lists: "+texts.size() +" "+imagePaths.size());
             return RecipeFragment.newInstance(texts, imagePaths);
         }
     }

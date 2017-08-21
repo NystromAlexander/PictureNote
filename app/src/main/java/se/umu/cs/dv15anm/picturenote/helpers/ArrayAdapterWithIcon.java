@@ -37,7 +37,7 @@ public class ArrayAdapterWithIcon extends ArrayAdapter<String>{
      * @param position The position in the list.
      * @param convertView The old view to be reused.
      * @param parent The parent the view will be attached to.
-     * @return
+     * @return The view with the images added.
      */
     @NonNull
     @Override

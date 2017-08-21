@@ -1,7 +1,6 @@
 package se.umu.cs.dv15anm.picturenote.camera.ocr;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -33,11 +32,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import se.umu.cs.dv15anm.picturenote.NoteActivity;
-import se.umu.cs.dv15anm.picturenote.NoteListActivity;
 import se.umu.cs.dv15anm.picturenote.R;
 import se.umu.cs.dv15anm.picturenote.camera.CameraActivity;
 import se.umu.cs.dv15anm.picturenote.camera.overlay.Overlay;
-import se.umu.cs.dv15anm.picturenote.helpers.ImageOcr;
 import se.umu.cs.dv15anm.picturenote.helpers.NoteType;
 
 /**
@@ -60,9 +57,12 @@ public class OcrCameraFragment extends Fragment {
     private ArrayList<String> mImagePaths;
     private int mPicturesTaken;
 
-
+    /**
+     * Mandatory empty constructor for the fragment manager to instantiate the
+     * fragment
+     */
     public OcrCameraFragment() {
-        // Required empty public constructor
+
     }
 
     /**
@@ -108,7 +108,7 @@ public class OcrCameraFragment extends Fragment {
      * @param inflater Used to inflate the UI elements.
      * @param container The container that will host the fragment.
      * @param savedInstanceState Contains the saved data of the fragment
-     * @return
+     * @return The finished ui.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -132,12 +132,8 @@ public class OcrCameraFragment extends Fragment {
             }
         });
 
-        if (mNoteType == NoteType.RECIPE && mPicturesTaken == 0) {
-            Snackbar.make(mGraphicOverlay, "Take picture of the recipe",
-                    Snackbar.LENGTH_LONG)
-                    .show();
-        } else if (mNoteType == NoteType.RECIPE && mPicturesTaken > 0) {
-            Snackbar.make(mPreview, "Take picture of ingredients",
+        if (mNoteType == NoteType.RECIPE) {
+            Snackbar.make(mGraphicOverlay, "Take picture of the recipe then ingredients",
                     Snackbar.LENGTH_LONG)
                     .show();
         }
@@ -164,7 +160,7 @@ public class OcrCameraFragment extends Fragment {
 
     /**
      * Save the captured texts, image paths and how many pictures have been captured.
-     * @param outState
+     * @param outState The saved data.
      */
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -239,11 +235,16 @@ public class OcrCameraFragment extends Fragment {
    }
 
 
-    /** Create a File for saving an image or video */
+    /**
+     * Create a File for saving an image
+     *
+     * @param type What type of file should be created
+     * @return The newly created file.
+     */
     private File getOutputMediaFile(int type){
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), NoteListActivity.APP_NAME);
+                Environment.DIRECTORY_PICTURES), getResources().getString(R.string.app_name));
 
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
@@ -300,12 +301,7 @@ public class OcrCameraFragment extends Fragment {
                 startNoteActivity();
             } else if (mNoteType == NoteType.RECIPE && mPicturesTaken == 2) {
                 startRecipeActivity();
-            } else { //For recipe the ingredients are captured after the recipe it self has been.
-                Snackbar.make(mPreview, "Take picture of ingredients",
-                        Snackbar.LENGTH_LONG)
-                        .show();
             }
-
 
         }
 
@@ -327,6 +323,7 @@ public class OcrCameraFragment extends Fragment {
                     previewSize.getHeight(),true);
             picture = Bitmap.createBitmap(scaledBitmap,0,0,scaledBitmap.getWidth(),
                     scaledBitmap.getHeight(),matrix,true);
+            scaledBitmap.recycle();
         }
 
 

@@ -17,7 +17,7 @@ public class Overlay extends View {
     private  float mWidthScaleFactor = 1.0f;
     private  float mHeightScaleFactor = 1.0f;
 
-    private Object mLock = new Object();
+    private final Object mLock = new Object();
     private int mCameraPreviewHeight;
     private int mCameraPreviewWidth;
     private List<OverlayGraphic> mGraphics = new ArrayList<>();

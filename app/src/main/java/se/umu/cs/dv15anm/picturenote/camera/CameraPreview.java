@@ -43,7 +43,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
-
         } catch (java.io.IOException e) {
             Log.w(TAG, "Error when setting camera preview: "+e.getMessage());
         }
@@ -79,34 +78,36 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         }
-        mCamera.setParameters(parameters);
+        if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+        }
 
-        if(display.getRotation() == Surface.ROTATION_0)
-        {
+
+
+        if(display.getRotation() == Surface.ROTATION_0) {
             Log.d(TAG, "rotation 0");
-            parameters.setPreviewSize(height, width);
             mCamera.setDisplayOrientation(90);
+            parameters.setRotation(90);
         }
 
-        if(display.getRotation() == Surface.ROTATION_90)
-        {
+        if(display.getRotation() == Surface.ROTATION_90) {
             Log.d(TAG, "rotation 90");
-            parameters.setPreviewSize(width, height);
-
+            mCamera.setDisplayOrientation(0);
+            parameters.setRotation(0);
         }
 
-        if(display.getRotation() == Surface.ROTATION_180)
-        {
+        if(display.getRotation() == Surface.ROTATION_180) {
             Log.d(TAG, "rotation 180");
-            parameters.setPreviewSize(height, width);
+            parameters.setRotation(270);
         }
 
-        if(display.getRotation() == Surface.ROTATION_270)
-        {
+        if(display.getRotation() == Surface.ROTATION_270) {
             Log.d(TAG, "rotation 270");
-            parameters.setPreviewSize(width, height);
             mCamera.setDisplayOrientation(180);
+            parameters.setRotation(180);
         }
+
+        mCamera.setParameters(parameters);
 
         try {
             mCamera.setPreviewDisplay(holder);

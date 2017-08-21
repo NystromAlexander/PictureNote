@@ -3,14 +3,12 @@ package se.umu.cs.dv15anm.picturenote;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 
 import se.umu.cs.dv15anm.picturenote.helpers.SingleFragmentActivity;
@@ -19,7 +17,7 @@ import se.umu.cs.dv15anm.picturenote.helpers.SingleFragmentActivity;
  * This is the main activity, the one that starts.
  */
 public class NoteListActivity extends SingleFragmentActivity {
-    public static final String APP_NAME = "Picture Note";
+
     private static final String TAG = "NoteListActivity";
     private static final int RC_HANDLE_CAMERA_PERM = 2;
     private static final int RC_HANDLE_EXT_STORAGE_PERM = 3;
@@ -59,7 +57,6 @@ public class NoteListActivity extends SingleFragmentActivity {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.CAMERA)) {
                 ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
-                return;
             }
        }
     }
@@ -131,7 +128,7 @@ public class NoteListActivity extends SingleFragmentActivity {
                         }
                     }).show();
                 }
-                return;
+                break;
             case RC_HANDLE_EXT_STORAGE_PERM:
                 if (grantResults.length != 0 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -139,11 +136,11 @@ public class NoteListActivity extends SingleFragmentActivity {
                 } else {
                     Log.w(TAG,"External storage permission denied");
                 }
-                return;
+                break;
             default:
                 Log.d(TAG, "Got unexpected permission result: " + requestCode);
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                return;
+               break;
         }
 
     }

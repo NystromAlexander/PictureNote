@@ -2,17 +2,10 @@ package se.umu.cs.dv15anm.picturenote.camera;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Window;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -20,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import se.umu.cs.dv15anm.picturenote.R;
+import se.umu.cs.dv15anm.picturenote.helpers.ImageAssists;
 
 /**
  * Activity that displays a image

@@ -1,4 +1,4 @@
-package se.umu.cs.dv15anm.picturenote.camera;
+package se.umu.cs.dv15anm.picturenote.helpers;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -17,6 +17,8 @@ import java.io.File;
 
 public class ImageAssists {
 
+    private static final String TAG = "ImageAssist";
+
     public static Bitmap fixOrientation(Bitmap image, int rotation) {
         if (rotation != 0) {
             Bitmap bMapRotate;
@@ -33,7 +35,8 @@ public class ImageAssists {
     /**
      * A method to get how many degrees the image has to be rotated.
      * Found at this forum thread:
-     * https://stackoverflow.com/questions/12726860/android-how-to-detect-the-image-orientation-portrait-or-landscape-picked-fro
+     * https://stackoverflow.com/questions/12726860/android-how-to-detect-the-image-orientation-
+     * portrait-or-landscape-picked-fro
      * @param imageFile The image file
      * @return Degrees the image need to be rotated.
      */
@@ -47,12 +50,15 @@ public class ImageAssists {
 
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_270:
+                    Log.d(TAG, "270");
                     rotate = 270;
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:
+                    Log.d(TAG, "180");
                     rotate = 180;
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_90:
+                    Log.d(TAG, "90");
                     rotate = 90;
                     break;
             }
@@ -66,7 +72,8 @@ public class ImageAssists {
     /**
      * Method to get the real path from a content uri.
      * Credit to this forum thread:
-     * https://stackoverflow.com/questions/20028319/how-to-convert-content-media-external-images-media-y-to-file-storage-sdc
+     * https://stackoverflow.com/questions/20028319/how-to-convert-content-media-external-images-
+     * media-y-to-file-storage-sdc
      * @param context The context of the activity that called.
      * @param contentUri The content uri to the image
      * @return The path to the image.

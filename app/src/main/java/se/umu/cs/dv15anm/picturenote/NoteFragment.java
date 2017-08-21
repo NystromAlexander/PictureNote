@@ -231,7 +231,7 @@ public class NoteFragment extends Fragment {
         if (!title.isEmpty()) {
             mTitleField.setText(title);
             if (title.equals(getResources().getString(R.string.default_title))) {
-                mTitleField.selectAll();
+                mTitleField.setText("");
             }
         }
         mNoteText.setText(mNote.getText());

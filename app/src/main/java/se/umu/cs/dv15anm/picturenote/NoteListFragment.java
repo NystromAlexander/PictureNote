@@ -1,7 +1,6 @@
 package se.umu.cs.dv15anm.picturenote;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,11 +23,11 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
-import se.umu.cs.dv15anm.picturenote.camera.ImageAssists;
+import se.umu.cs.dv15anm.picturenote.helpers.ImageAssists;
 import se.umu.cs.dv15anm.picturenote.camera.ocr.OcrCameraActivity;
 import se.umu.cs.dv15anm.picturenote.database.NoteBoard;
 import se.umu.cs.dv15anm.picturenote.helpers.DialogCreator;
-import se.umu.cs.dv15anm.picturenote.helpers.ImageOcr;
+import se.umu.cs.dv15anm.picturenote.camera.ocr.ImageOcr;
 import se.umu.cs.dv15anm.picturenote.helpers.NoteType;
 import se.umu.cs.dv15anm.picturenote.models.Note;
 
