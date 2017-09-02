@@ -1,8 +1,10 @@
 package se.umu.cs.dv15anm.picturenote;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,9 +21,7 @@ import se.umu.cs.dv15anm.picturenote.helpers.SingleFragmentActivity;
 public class NoteListActivity extends SingleFragmentActivity {
 
     private static final String TAG = "NoteListActivity";
-    private static final int RC_HANDLE_CAMERA_PERM = 2;
-    private static final int RC_HANDLE_EXT_STORAGE_PERM = 3;
-    private static final int RC_HANDLE_EXT_STORAGE_READ_PERM = 4;
+    private static final int RC_HANDLE_ALL_PERM = 2;
 
     /**
      * Create the activity and setup the UI.
@@ -31,8 +31,8 @@ public class NoteListActivity extends SingleFragmentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestCameraPermission();
-        requestStoragePermission();
+        requestPermissions();
+
     }
 
     /**
@@ -45,57 +45,36 @@ public class NoteListActivity extends SingleFragmentActivity {
     }
 
     /**
-     * If the app do not have camera permission request the permission.
+     * Check if the application has the required permissions
+     * @param context The context of the calling activity
+     * @param permissions The permissions required by the application.
+     * @return False if there is at least one permission missing else true.
      */
-    private void requestCameraPermission() {
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (rc != PackageManager.PERMISSION_GRANTED) {
-            Log.w(TAG, "Camera permission is not granted. Requesting permission");
-
-            final String[] permissions = new String[]{Manifest.permission.CAMERA};
-
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.CAMERA)) {
-                ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
+    private boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null
+                && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
             }
-       }
+        }
+        return true;
     }
-
 
     /**
-     * If the app do not have external storage permission request it.
+     * Request permission to use camera and external storage.
      */
-    private void requestStoragePermission() {
-
-        int rc = ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-       if (rc != PackageManager.PERMISSION_GRANTED) {
-           Log.w(TAG, "Storage permission is not granted. Requesting permission");
-
-           final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
-           if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
-                   Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-               ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_EXT_STORAGE_PERM);
-
-           }
-       }
-
-       rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-       if (rc != PackageManager.PERMISSION_GRANTED) {
-           Log.w(TAG, "Storage read permission is not granted. Requesting permission");
-
-           final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-
-           if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
-                   Manifest.permission.READ_EXTERNAL_STORAGE)) {
-               ActivityCompat.requestPermissions(this, permissions,
-                       RC_HANDLE_EXT_STORAGE_READ_PERM);
-
-           }
-       }
+    private void requestPermissions() {
+        String[] permissions = {Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE};
+        if (!hasPermissions(this, permissions)) {
+            ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_ALL_PERM);
+        }
     }
+
 
     /**
      * Handles the result after asking for permissions.
@@ -108,33 +87,30 @@ public class NoteListActivity extends SingleFragmentActivity {
                                            @NonNull int[] grantResults) {
 
         switch (requestCode) {
-            case RC_HANDLE_CAMERA_PERM:
-                if (grantResults.length != 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Camera permission granted");
+            case RC_HANDLE_ALL_PERM:
+                if (grantResults.length != 0 && checkGrantResults(grantResults)) {
+                    Log.d(TAG, "Permissions granted");
                 } else {
-                    Log.w(TAG,"Camera permission denied");
-                    new AlertDialog.Builder(this)
-                            .setMessage("This app requires camera permission to properly function")
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            requestCameraPermission();
-                        }
-                    }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    }).show();
-                }
-                break;
-            case RC_HANDLE_EXT_STORAGE_PERM:
-                if (grantResults.length != 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Storage write permission granted");
-                } else {
-                    Log.w(TAG,"External storage permission denied");
+                    Log.w(TAG,"Permissions denied");
+                    if (shoulsAskAgain()) {
+                        new AlertDialog.Builder(this)
+                                .setMessage("This app requires camera and storage permission to " +
+                                        "properly function. Without these the app has very " +
+                                        "limited to no functionality.")
+                                .setPositiveButton(R.string.ok,
+                                        new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        requestPermissions();
+                                    }
+                                }).setNegativeButton(R.string.cancel,
+                                new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        }).show();
+                    }
                 }
                 break;
             default:
@@ -143,5 +119,25 @@ public class NoteListActivity extends SingleFragmentActivity {
                break;
         }
 
+    }
+
+    private boolean shoulsAskAgain() {
+        return ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)
+                || ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE);
+
+    }
+
+
+    private boolean checkGrantResults(int[] grantResults) {
+        for (int res: grantResults) {
+            if (res != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

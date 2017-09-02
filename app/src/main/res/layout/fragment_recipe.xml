@@ -86,6 +86,31 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/Recipe_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recipe"
+                    android:textAllCaps="false"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <View
+                    android:id="@+id/recipe_div"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_below="@id/Recipe_header"
+                    android:layout_alignLeft="@id/Recipe_header"
+                    android:layout_alignRight="@id/Recipe_header"
+                    android:background="@android:color/darker_gray"
+                    />
+            </RelativeLayout>
+
 
             <EditText
                 android:id="@+id/recipe_text"
@@ -94,6 +119,29 @@
                 android:ems="10"
                 android:inputType="textMultiLine"
                 />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/ingredients_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ingredients"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+                <View
+                    android:id="@+id/ingredients_div"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_below="@id/ingredients_header"
+                    android:layout_alignLeft="@id/ingredients_header"
+                    android:layout_alignRight="@id/ingredients_header"
+                    android:background="@android:color/darker_gray"
+                    />
+            </RelativeLayout>
+
 
             <EditText
                 android:id="@+id/ingredients_text"

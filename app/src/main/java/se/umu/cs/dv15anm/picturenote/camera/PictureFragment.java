@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +26,7 @@ public class PictureFragment extends Fragment {
 
     private static final String ARGS_IMAGE_PATH = "image_path";
     private static final String ARGS_IMAGE = "image";
+    private static final String TAG = "PictureFragment";
 
     private String mImagePath;
     private ImageView mImageView;
@@ -76,7 +79,8 @@ public class PictureFragment extends Fragment {
             bitmap = ImageAssists.fixOrientation(bitmap, rotateImage);
             mImageView.setImageBitmap(bitmap);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Log.w(TAG, "Could not load image file: "+e.getMessage());
+            Toast.makeText(getActivity(),"Could not load image", Toast.LENGTH_SHORT).show();
         }
     }
 

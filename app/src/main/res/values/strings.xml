@@ -13,7 +13,8 @@
     <string name="view_image">Note Image</string>
     <string name="default_title">(No title)</string>
     <string name="remove_item">Remove Note</string>
-
+    <string name="recipe">Recipe</string>
+    <string name="ingredients">Ingredients</string>
     <string name="no_image_text">No image</string>
 
     <string name="remove_dialog_title">Remove content</string>

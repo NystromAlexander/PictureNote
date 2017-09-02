@@ -31,7 +31,7 @@ public class TextConverter {
             for (Text text: texts) {
                 completeText = completeText + "\n" + text.getValue();
             }
-            completeText = completeText + "\n";
+//            completeText = completeText + "\n";
         }
 
         return completeText;

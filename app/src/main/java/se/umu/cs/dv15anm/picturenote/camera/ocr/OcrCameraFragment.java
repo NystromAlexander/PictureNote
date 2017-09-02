@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -52,6 +53,7 @@ public class OcrCameraFragment extends Fragment {
     private OcrCameraPreview mPreview;
     private Overlay mGraphicOverlay;
     private FrameLayout mPreviewFrame;
+    private CoordinatorLayout mSnackBarHook;
     private NoteType mNoteType;
     private ArrayList<String> mTexts;
     private ArrayList<String> mImagePaths;
@@ -117,6 +119,7 @@ public class OcrCameraFragment extends Fragment {
         mPreview = new OcrCameraPreview(getActivity());
         mGraphicOverlay = (Overlay) view.findViewById(R.id.graphic_overlay);
         mPreviewFrame = (FrameLayout) view.findViewById(R.id.preview_frame);
+        mSnackBarHook = (CoordinatorLayout) view.findViewById(R.id.snackbar_hook);
 
         if (havePermission()) {
             createCameraSource();
@@ -132,12 +135,6 @@ public class OcrCameraFragment extends Fragment {
             }
         });
 
-        if (mNoteType == NoteType.RECIPE) {
-            Snackbar.make(mGraphicOverlay, "Take picture of the recipe then ingredients",
-                    Snackbar.LENGTH_LONG)
-                    .show();
-        }
-
         return view;
     }
 
@@ -145,8 +142,11 @@ public class OcrCameraFragment extends Fragment {
      * Start a NoteActivity with a NoteFragment to display the captured note.
      */
     private void startNoteActivity() {
-        Intent intent = NoteActivity.newIntent(getActivity(),mTexts, mImagePaths, NoteType.STANDARD);
+        Intent intent = NoteActivity.newIntent(getActivity(),mTexts,mImagePaths, NoteType.STANDARD);
         startActivity(intent);
+        mPicturesTaken = 0;
+        mTexts.clear();
+        mImagePaths.clear();
     }
 
     /**
@@ -154,8 +154,11 @@ public class OcrCameraFragment extends Fragment {
      */
     private void startRecipeActivity() {
         Log.d(TAG, "list sizes: "+mTexts.size()+" "+mImagePaths.size());
-        Intent intent = NoteActivity.newIntent(getActivity(),mTexts,mImagePaths,NoteType.RECIPE);
+        Intent intent = NoteActivity.newIntent(getActivity(),mTexts,mImagePaths, NoteType.RECIPE);
         startActivity(intent);
+        mPicturesTaken = 0;
+        mTexts.clear();
+        mImagePaths.clear();
     }
 
     /**
@@ -179,6 +182,8 @@ public class OcrCameraFragment extends Fragment {
         if (mPreview != null) {
             mPreviewFrame.addView(mPreview, 0);
         }
+
+        createRecipeSnackBar();
     }
 
     /**
@@ -215,6 +220,18 @@ public class OcrCameraFragment extends Fragment {
         }
         Log.d(TAG, "Don't have camera permission");
         return false;
+    }
+
+    private void createRecipeSnackBar() {
+        if (mNoteType == NoteType.RECIPE && mPicturesTaken == 0) {
+            Snackbar.make(mSnackBarHook, "Take picture of the recipe",
+                    Snackbar.LENGTH_LONG)
+                    .show();
+        } else if (mNoteType == NoteType.RECIPE && mPicturesTaken > 0) {
+            Snackbar.make(mSnackBarHook, "Take picture of the ingredients",
+                    Snackbar.LENGTH_LONG)
+                    .show();
+        }
     }
 
     /**
@@ -301,6 +318,8 @@ public class OcrCameraFragment extends Fragment {
                 startNoteActivity();
             } else if (mNoteType == NoteType.RECIPE && mPicturesTaken == 2) {
                 startRecipeActivity();
+            } else if (mNoteType == NoteType.RECIPE) {
+                createRecipeSnackBar();
             }
 
         }

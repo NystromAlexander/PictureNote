@@ -16,6 +16,13 @@
             android:id="@+id/graphic_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/snackbar_hook"
+            android:layout_gravity="bottom">
+
+        </android.support.design.widget.CoordinatorLayout>
     </android.support.v7.widget.FitWindowsFrameLayout>
 
     <Button
